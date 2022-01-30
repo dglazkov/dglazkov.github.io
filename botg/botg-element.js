@@ -97,42 +97,6 @@ const createHtml = (points) => {
       fill: var(--gray);
     }
 
-    #labels {
-      position: absolute;
-      padding: 3vw 1.2vw;
-      box-sizing: border-box;
-      display: flex;
-      width: calc(100vw - 70px);
-      height: calc((100vw - 70px) * 0.58);
-      justify-content: space-between;
-      align-items: flex-end;
-      overflow: hidden;
-    }
-
-    #vertical {
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      align-self: stretch;
-    }
-
-    slot {
-      display: flex;
-      align-items: center;
-    }
-
-    #vertical slot {
-      width: 10vw;
-      height: 7vw;
-      align-items: flex-end;
-    }
-
-    slot[name=horizontal] {
-      width: 12vw;
-      height: 8.4vw;
-    }
-
-
   </style>
   <svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 864 500">
     <path id="now" d="M 432, 10 L 432, 480" />
@@ -154,6 +118,10 @@ const createHtml = (points) => {
       <path d="M 10,10 L 10,497 L 847,497" />
     </g>
     <g id="labels" >
+      <g transform="translate(740, 444)">
+        <rect fill="white" x="0" y="0" width="58" height="48" />
+        <text class="label" x="10" y="36">TIME</text>
+      </g>
       <g transform="translate(360, 30)">
         <rect fill="white" x="0" y="0" width="57" height="48" />
         <text class="label" x="10" y="36">PAST</text>
@@ -162,15 +130,16 @@ const createHtml = (points) => {
         <rect fill="white" x="0" y="0" width="78" height="48" />
         <text class="label" x="10" y="36">FUTURE</text>
       </g>
+      <g transform="translate(25, 90) rotate(-90)">
+        <rect fill="white" x="0" y="0" width="55" height="35" />
+        <text class="small-label" x="5" y="26">BETTER</text>
+      </g>
+      <g transform="translate(25, 480) rotate(-90)">
+        <rect fill="white" x="0" y="0" width="55" height="35" />
+        <text class="small-label" x="5" y="26">WORSE</text>
+      </g>
     </g>
   </svg>
-  <div id="labels">
-    <div id="vertical">
-      <slot name="vertical-top"></slot>
-      <slot name="vertical-bottom"></slot>
-    </div>
-    <slot name="horizontal"></slot>
-  </div>
 `;
 }
 
