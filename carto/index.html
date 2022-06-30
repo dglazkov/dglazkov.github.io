@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <style>
+    text {
+      cursor: pointer;
+      user-select: none;
+    }
+  </style>
+</head>
+
+<body>
+  <script type="module">
+    import { data } from './dummy-data.js';
+    import { forceGraph } from './force-graph.js';
+
+    const svg_node = forceGraph(data, {
+      height: window.innerHeight,
+      width: window.innerWidth,
+    });
+
+    document.body.appendChild(svg_node);
+
+  </script>
+</body>
+
+</html>
