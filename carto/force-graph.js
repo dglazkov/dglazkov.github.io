@@ -1,36 +1,39 @@
+import * as d3 from "https://cdn.skypack.dev/d3@7";
+
 const NODE_RADIUS = 5;
+const LOOP_RADIUS = 25;
 
 const linkArc = (d) => {
-  const r = Math.hypot(d.target.x - d.source.x, d.target.y - d.source.y);
+  const is_loop = d.target == d.source;
+  const radius = is_loop ? LOOP_RADIUS : Math.hypot(d.target.x - d.source.x, d.target.y - d.source.y);
+  const large_arc_flag = Number(is_loop);
+  const target_y = d.target.y - large_arc_flag;
   return `
-            M${d.source.x},${d.source.y}
-            A${r},${r} 0 0,1 ${d.target.x},${d.target.y}
-          `;
+    M ${d.source.x},${d.source.y}
+    A
+      ${radius}, ${radius} 
+      0 ${large_arc_flag} 1 
+      ${d.target.x},${target_y}
+  `;
 };
 
 const drag = (simulation) => {
-  function dragstarted(event, d) {
-    if (!event.active) simulation.alphaTarget(0.3).restart();
-    d.fx = d.x;
-    d.fy = d.y;
-  }
-
-  function dragged(event, d) {
-    d.fx = event.x;
-    d.fy = event.y;
-  }
-
-  function dragended(event, d) {
-    if (!event.active) simulation.alphaTarget(0);
-    d.fx = null;
-    d.fy = null;
-  }
-
   return d3
     .drag()
-    .on("start", dragstarted)
-    .on("drag", dragged)
-    .on("end", dragended);
+    .on("start", (event, d) => {
+      if (!event.active) simulation.alphaTarget(0.3).restart();
+      d.fx = d.x;
+      d.fy = d.y;
+    })
+    .on("drag", (event, d) => {
+      d.fx = event.x;
+      d.fy = event.y;
+    })
+    .on("end", (event, d) => {
+      if (!event.active) simulation.alphaTarget(0);
+      d.fx = null;
+      d.fy = null;
+    });
 };
 
 function forceGraph(data, { width, height }) {
@@ -42,7 +45,7 @@ function forceGraph(data, { width, height }) {
 
   const simulation = d3
     .forceSimulation(nodes)
-    .force("link", d3.forceLink(links).id((d) => d.id).distance(100))
+    .force("link", d3.forceLink(links).id((d) => d.id))
     .force("charge", d3.forceManyBody().strength(-300))
     .force("x", d3.forceX())
     .force("y", d3.forceY());
