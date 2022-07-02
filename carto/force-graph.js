@@ -1,19 +1,18 @@
 import * as d3 from "https://cdn.skypack.dev/d3@7";
 
-const NODE_RADIUS = 5;
+const NODE_RADIUS = 6;
 const LOOP_RADIUS = 25;
 
 const linkArc = (d) => {
   const is_loop = d.target == d.source;
   const radius = is_loop ? LOOP_RADIUS : Math.hypot(d.target.x - d.source.x, d.target.y - d.source.y);
-  const large_arc_flag = Number(is_loop);
-  const target_y = d.target.y - large_arc_flag;
+  // the tiny "- .1" is there to make the arc not be closed when it's a self-loop.
   return `
     M ${d.source.x},${d.source.y}
     A
       ${radius}, ${radius} 
-      0 ${large_arc_flag} 1 
-      ${d.target.x},${target_y}
+      0 ${Number(is_loop)} 1 
+      ${d.target.x},${d.target.y - .1}
   `;
 };
 
@@ -64,12 +63,12 @@ function forceGraph(data, { width, height }) {
     .attr("viewBox", "0 -5 10 10")
     .attr("refX", 15)
     .attr("refY", -0.5)
-    .attr("markerWidth", 6)
-    .attr("markerHeight", 6)
+    .attr("markerWidth", NODE_RADIUS)
+    .attr("markerHeight", NODE_RADIUS)
     .attr("orient", "auto")
     .append("path")
     .attr("fill", color)
-    .attr("d", "M0,-5L10,0L0,5");
+    .attr("d", "M0,-5 L10,0 L0,5 L3,0");
 
   const link = svg
     .append("g")
@@ -96,6 +95,14 @@ function forceGraph(data, { width, height }) {
     .attr("stroke", "white")
     .attr("stroke-width", 1.5)
     .attr("r", NODE_RADIUS);
+
+  node
+    .append("circle")
+    .attr("stroke", "none")
+    .attr("fill", "white")
+    .attr("stroke-width", 1.5)
+    .attr("r", NODE_RADIUS - 2);
+
 
   node
     .append("text")
