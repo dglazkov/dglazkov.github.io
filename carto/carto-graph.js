@@ -2,6 +2,14 @@ import * as d3 from "https://cdn.skypack.dev/d3@7";
 
 const NODE_RADIUS = 6;
 const LOOP_RADIUS = 35;
+const LINK_COLORS = {
+  'accelerates': 'green',
+  'attenuates': 'red',
+};
+const NODE_COLORS = {
+  'ecosystem': 'blue',
+  'product': 'gray',
+}
 
 const linkArc = (d) => {
   const is_loop = d.target == d.source;
@@ -39,8 +47,10 @@ function forceGraph(data, { width, height }) {
 
   const links = data.links;
   const nodes = data.nodes;
-  const types = Array.from(new Set(links.map(l => l.type)));
-  const color = d3.scaleOrdinal(types, d3.schemeCategory10);
+  const linkTypes = Array.from(new Set(links.map(l => l.type)));
+  const nodeTypes = Array.from(new Set(nodes.map(n => n.type)));
+  const linkColor = t => LINK_COLORS[t];
+  const nodeColor = t => NODE_COLORS[t];
 
   const simulation = d3
     .forceSimulation(nodes)
@@ -57,7 +67,7 @@ function forceGraph(data, { width, height }) {
   svg
     .append("defs")
     .selectAll("marker")
-    .data(types)
+    .data(linkTypes)
     .join("marker")
     .attr("id", (d) => `arrow-${d}`)
     .attr("viewBox", "0 -6 10 12")
@@ -67,7 +77,7 @@ function forceGraph(data, { width, height }) {
     .attr("markerHeight", NODE_RADIUS)
     .attr("orient", "auto")
     .append("path")
-    .attr("fill", color)
+    .attr("fill", linkColor)
     .attr("d", "M0,-6 L10,0 L0,6 L3,0");
 
   const link = svg
@@ -77,7 +87,7 @@ function forceGraph(data, { width, height }) {
     .selectAll("path")
     .data(links)
     .join("path")
-    .attr("stroke", d => color(d.type))
+    .attr("stroke", d => linkColor(d.type))
     .attr("marker-end", d => `url(${new URL(`#arrow-${d.type}`, location)})`);
 
   const node = svg
@@ -92,6 +102,7 @@ function forceGraph(data, { width, height }) {
 
   node
     .append("circle")
+    .attr("fill", d => nodeColor(d.type))
     .attr("stroke", "white")
     .attr("stroke-width", 1.5)
     .attr("r", NODE_RADIUS);
@@ -101,7 +112,7 @@ function forceGraph(data, { width, height }) {
     .attr("stroke", "none")
     .attr("fill", "white")
     .attr("stroke-width", 1.5)
-    .attr("r", NODE_RADIUS - 2);
+    .attr("r", n => n.type == 'ecosystem' ? 0 : NODE_RADIUS - 3);
 
 
   node
