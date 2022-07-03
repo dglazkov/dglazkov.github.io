@@ -1,13 +1,23 @@
 import * as d3 from "https://cdn.skypack.dev/d3@7";
 
+const HTML = `
+<style>
+text {
+  cursor: pointer;
+  user-select: none;
+}
+</style>`;
+
 const NODE_RADIUS = 6;
 const LOOP_RADIUS = 35;
 const LINK_COLORS = {
-  'accelerates': 'green',
-  'attenuates': 'red',
+  'setting': 'gray',
+  'vendor': 'BlueViolet',
+  'customer': 'magenta',
+  'relates': 'lightblue',
 };
 const NODE_COLORS = {
-  'ecosystem': 'blue',
+  'setting': 'blue',
   'product': 'gray',
 }
 
@@ -23,6 +33,12 @@ const linkArc = (d) => {
       ${d.target.x},${d.target.y - 1}
   `;
 };
+
+const linkLine = (d) => {
+  return `
+    M ${d.source.x},${d.source.y}
+    L ${d.target.x},${d.target.y}`;
+}
 
 const drag = (simulation) => {
   return d3
@@ -114,7 +130,6 @@ function forceGraph(data, { width, height }) {
     .attr("stroke-width", 1.5)
     .attr("r", n => n.type == 'ecosystem' ? 0 : NODE_RADIUS - 3);
 
-
   node
     .append("text")
     .attr("x", 8)
@@ -124,7 +139,7 @@ function forceGraph(data, { width, height }) {
     .lower()
     .attr("fill", "none")
     .attr("stroke", "white")
-    .attr("stroke-width", 3);
+    .attr("stroke-width", 4);
 
   simulation.on("tick", () => {
 
@@ -144,7 +159,7 @@ function forceGraph(data, { width, height }) {
     node
       .attr("transform", (d) => `translate(${setX(d)},${setY(d)})`);
 
-    link.attr("d", linkArc);
+    link.attr("d", linkLine);
 
   });
 
@@ -163,6 +178,7 @@ class GraphElement extends HTMLElement {
       return;
 
     const shadow = this.attachShadow({ mode: 'open' });
+    shadow.innerHTML = HTML;
 
     const svg_node = forceGraph(data, {
       height: 400,
